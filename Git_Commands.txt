@@ -13,7 +13,7 @@
 
    cd existing_folder
    git init
-   git remote add origin <https://agile.nat.bt.com/gitlab/611216999/fnd_applitools_test.git>
+   git remote add origin <clone url>
    git add .
    git commit -m "Initial commit"
    git push -u origin master
