@@ -1,0 +1,43 @@
+1. Pull/Clone project from master branch
+
+   cd existing_folder
+   git clone <Clone url>
+
+
+2. Pull/Clone project from specific branch
+
+   cd existing_folder
+   git clone -b <branch name > <Clone url>
+
+3. Push existing local project to Git master branch
+
+   cd existing_folder
+   git init
+   git remote add origin <https://agile.nat.bt.com/gitlab/611216999/fnd_applitools_test.git>
+   git add .
+   git commit -m "Initial commit"
+   git push -u origin master
+
+4 merge branch to master branch
+
+code for create branch - git checkout -b <branch name>
+>>>>Merge someone local branch to master branch 
+
+   1 clone project-  git clone <clone url> any location
+   2 go to project directory- cd <local project directory path>	
+   3 go to merge branch - git checkout <merge branch name>
+   4 pull merge branch project-  git pull
+   5 go to master branch- git checkout <master branch name>
+   6 merge branch-  git merge <merge branch name> (tpye :q and enter)
+   7 commit code-  git commit-m <msg>
+   8 push code-  git push
+
+>>>> Merge your local working branch to master branch
+
+   1 go to your project directory - cd <project path>
+   2 commit code on your branch
+   3 go to master branch- git checkout <master branch name>
+   4 pull master branch - git pull	
+   4 merge branch-  git merge <merge branch name> (tpye :q and enter)
+   5 commit code-  git commit-m <msg>
+   6 push code-  git push

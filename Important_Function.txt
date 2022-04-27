@@ -1,0 +1,427 @@
+public static  WebDriver loadDriver() {		 /// put in configuration java file
+			browserName = Constants.browserName;			
+			switch (browserName) {
+				case "Chrome":
+					System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir")+ "chromedriver.exe");					
+					ChromeOptions ch_options = new ChromeOptions();	
+					ch_options.setAcceptInsecureCerts(true);
+					ch_options.addArguments("--ignore-ssl-errors=yes");
+					ch_options.addArguments("--ignore-certificate-errors");
+					ch_options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.ACCEPT);
+					ch_options.setHeadless(false);
+					driver = new ChromeDriver(ch_options);
+					driver.manage().window().setPosition(new Point(0, 0));
+					driver.manage().window().setSize(new Dimension(1360, 768));
+					break;					
+				case "Remote_Driver":					
+					ChromeOptions remote_options = new ChromeOptions();
+					remote_options.addArguments("--start-maximized");
+					remote_options.setCapability("acceptInsecureCerts", true);
+					remote_options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.ACCEPT);
+					URL url = new URL("http://10.13.222.60:61000/wd/hub");
+					driver = new RemoteWebDriver(url, remote_options);
+					break;
+			}
+}
+public loadProperties(){ /// put in configuration java construcctor 
+		try {
+		Properties	prop = new Properties();
+			FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "\\src\\config\\config.properties");
+			prop.load(fis);
+		} catch (IOException e) {
+			e.getMessage();
+		}
+	}
+public static void waitForPageLoaded()	{
+		try {
+			JavascriptExecutor js =(JavascriptExecutor)driver;
+			//this loop will check if the page is ready
+			for(int i=0;i<400;i++){
+				Thread.sleep(4000);
+				if(js.executeScript("return document.readyState").toString().equals("complete")){					
+					break;
+				}				
+			}
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			
+		}
+	}
+public boolean waitForElementLoad(WebElement element) {
+		try {
+			WebDriverWait wait = new WebDriverWait(driver,120);
+			wait.until(ExpectedConditions.visibilityOf(element));
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+}
+public static String getDate(int dayIncrement)	{
+		SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/YYYY");
+		Date date=new Date();
+		Calendar c=Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.DATE, dayIncrement);
+		//System.out.println(sdf.format(c.getTime()));
+		return sdf.format(c.getTime());				
+	}
+public static String getDay(int dayIncrement)	{
+		String newDay=null;
+		SimpleDateFormat sdf=new SimpleDateFormat("dd");
+		Date date=new Date();
+		Calendar c=Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.DATE, dayIncrement);
+		String day=sdf.format(c.getTime());
+		System.out.println("New Day "+day);		
+		if(day.startsWith("0"))
+		{
+			newDay=day.replace("0", "");
+			System.out.println("New day "+newDay);	
+			return newDay;
+		}
+			return day;			
+	}
+public static String getTime(String actualTime,int timeIncrement) throws Exception {
+			
+				//String time = "12:59";  // Start date
+				SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+				Calendar c = Calendar.getInstance();
+				c.setTime(sdf.parse(actualTime));
+				c.add(Calendar.MINUTE, timeIncrement);  // number of days to add				
+				return sdf.format(c.getTime());
+			
+		}
+public void switchWindows(int i)	{	//switch window tabs
+		Set<String> winHandles=driver.getWindowHandles();
+		//System.out.println(winHandles.size());
+		ArrayList<String> tabs=new ArrayList<>(winHandles);
+		driver.switchTo().window(tabs.get(i));
+	}
+//------------------------------------------------------------
+//----------------Extend report------------------------------------------
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+// jar name eyes-common-java3-3.172.0.jar, eyes-connectivity-java3-jersey2x-3.172.0.jar, 
+//eyes-sdk-core-java3-3.172.0.jar, eyes-selenium-common-3.172.0.jar, eyes-selenium-java3-3.172.0.jar
+public void initializeReport(WebDriver driver) { /// put in configuration java file
+		try {
+			Globalvariable.setFeaturename(this.getClass().getSimpleName());
+			Reports report = new Reports();
+			report.setTestName(Globalvariable.getFeaturename());
+			report.startReport();
+			report.setDriver(driver);
+		} catch (Exception ex) {
+			Assert.fail(ex.getMessage());
+		}
+	}
+public Reports startReport() { /// put in report java file
+		setReportPath();
+		ExtentReports eReport = new ExtentReports();
+		ExtentHtmlReporter reporter = new ExtentHtmlReporter(reportFile);
+		eReport.attachReporter(reporter);
+		ExtentTest logger = eReport.createTest(testName);
+		reporter.config().setTheme(Theme.DARK);
+		reporter.config().setDocumentTitle("MDU AUTOMATION REPORT");
+		reporter.config().setReportName("MDU_Test Automation");
+		eReport.setSystemInfo("User Name", System.getProperty("user.name"));
+		eReport.setSystemInfo("Time Zone", System.getProperty("user.timezone"));
+		eReport.setSystemInfo("Machine", "Windows 10" +" "+ "64 Bit");
+		eReport.setSystemInfo("Selenium", "3.7.0");
+		eReport.setSystemInfo("Maven", "3.5.2");
+		eReport.setSystemInfo("Java Version", System.getProperty("java.version"));
+		return this;
+	}
+private void setReportPath() { /// put in report java file
+		try {
+			timeStamp = fn_getDateTime();
+			reportFolder = System.getProperty("user.dir") + File.separator + "reports" + File.separator + testName + "_"
+					+ timeStamp;
+			reportFile = reportFolder + File.separator + testName + "_" + timeStamp + ".html";			
+			screenshotFolderPass = reportFolder + File.separator + "screenshots" + File.separator + "Passed";
+			screenshotFolderFail = reportFolder + File.separator + "screenshots"+ File.separator + "Failed";			
+			File screensFdr = new File(screenshotFolderPass);
+			screensFdr.mkdirs();			
+			File screensFd1r = new File(screenshotFolderFail);
+			screensFd1r.mkdirs();			
+		} catch (Exception ex) {
+			//ex.printStackTrace();
+		}
+	}
+	private String fn_getDateTime() { /// put in report java file
+		try {
+			DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH-mm-ss");
+			Date date = Calendar.getInstance().getTime();
+			String currentDate = dateFormat.format(date);
+			return currentDate;
+		} catch (Exception ex) {
+			//ex.printStackTrace();
+			reportFailEvent("Unable to take the screenshot at this time");
+		}
+		return null;
+	}
+public void fn_takeScreenShotPass(String fileName) { /// put in report java file
+		try {						
+			TakesScreenshot scrShot = ((TakesScreenshot) driver);
+			File srcFile = scrShot.getScreenshotAs(OutputType.FILE);
+			File destFile = new File(screenshotFolderPass + File.separator + fileName.replaceAll("[^a-zA-Z0-9]", "_") + "_"
+					+ fn_getDateTime() + ".jpg");
+			FileUtils.copyFile(srcFile, destFile);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			reportWarningEvent("Unable to capture the screenshot");
+		}
+	}
+public void fn_takeScreenShotFromRobotclass(String fileName) { /// put in report java file
+				try {					
+					System.out.println("Taking screenshot taken");				
+					//create object of Robot class
+					Robot robot =new Robot();
+					Rectangle screenSize = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());					
+					// Capturing screenshot by providing size
+		            BufferedImage tmp = robot.createScreenCapture(screenSize); 
+		            String path=screenshotFolderPass + File.separator + fileName.replaceAll("[^a-zA-Z0-9]", "_") + "_"
+							+ fn_getDateTime() + ".png";
+		            // To copy temp image in to permanent file
+		            ImageIO.write(tmp, "png",new File(path)); 
+					
+				} catch (Exception ex) {
+					System.out.println(ex.getMessage());
+					reportWarningEvent("Unable to capture the screenshot");
+				}
+			} 
+public void reportPassEvent(String stepName) { /// put in report java file
+		logger.log(Status.PASS, stepName);
+		fn_takeScreenShotPass(stepName);
+}
+public void reportFailEvent(String stepName){ /// put in report java file
+		logger.log(Status.FAIL, stepName);	
+		fn_takeScreenShotFail(stepName);
+		Assert.fail(stepName);	
+		}
+public String getTestName() { /// put in report java file
+		return testName;
+	}
+public void setTestName(String testName) { /// put in report java file
+		this.testName = testName;
+	}
+public void endReport() { /// put in report java file
+		try {
+			eReport.flush();
+			driver.quit();
+		} catch (Exception ex) {
+		}
+	}
+//------------------------------------------------------------------------------
+//-----------Applitools--------------------------
+import com.applitools.eyes.BatchInfo;
+import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.exceptions.DiffsFoundException;
+import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.fluent.Target;
+public void initializeBatch(String batchName){
+			try {
+				String myEyesServer = ""; //provide applitools url
+				Eyes eyes = new Eyes();
+				BatchInfo batch=new BatchInfo(batchName);
+				eyes.setBatch(batch);
+				eyes.setMatchTimeout(0);
+				eyes.setSendDom(false); 
+				//eyes.setForceFullPageScreenshot(true);	//for capture full page top to bottom				
+				eyes.setApiKey("usQa74fKtmoIKYkR2GZzOaeBYv10");//provide applitools project api key
+				eyes.setServerUrl(myEyesServer);
+				eyes.open(driver, "FTTP_BF", batchName,new RectangleSize(1268, 638));
+				//eyes.open(driver, "FTTP_BF", batchName);				
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		}
+	/**
+	  * Capture window with check point image name.
+	  */	
+		public void verifyWindow(String checkImageName) throws Exception {		
+			try {
+				eyes.checkWindow(checkImageName);
+			} 
+			catch (IllegalStateException e) {
+				System.out.println(e);
+			}				
+		}		
+	/**
+	  * Capture only target popup window with check point image name.
+	  * You have to provide target popup window element location
+	  */	
+			public void verifyWindow(String checkImageName,WebElement element) throws Exception {		
+				try {
+					eyes.check(checkImageName, Target.region(element));					
+				} 
+				catch (IllegalStateException e) {
+					System.out.println(e);
+				}				
+			}
+	//--Close Eyes	
+		public void closeEyes()		{
+			try 
+			{
+				eyes.close();				
+			}
+			catch (DiffsFoundException e) {
+				System.out.println("Checkpoint Image is not matched with basline image in Applitool server");
+				
+			}
+		}
+//--------------------------------------------------------------------------
+//-----------------Excel code--------------
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+public Excel_Test_Data()	{ // put all code in constructor
+		try {
+			FileInputStream input=new FileInputStream(<"provide the excel file path">);
+			XSSFWorkbook workbook=new XSSFWorkbook(input);
+			XSSFSheet sheet=workbook.getSheet("ControlSheet");		
+		} catch (Exception e) {
+			System.out.println(e);			
+		}
+	}
+	public String getEnvDetail(){	// get data from cell	
+		sheet=workbook.getSheet("ControlSheet");			
+		env=sheet.getRow(1).getCell(0).getStringCellValue();		
+		return env;
+	}
+	public  String getCellData() throws Exception {
+		//int RowNum, int ColNum
+		try {
+			String CellData=null;
+			int rowCount=getRowUsed();
+			System.out.println("total row "+rowCount);
+			for(int i=1;i<=rowCount;i++)
+			{
+				Cell = sheet.getRow(i).getCell(1);
+				if(Cell==null)
+				{
+					XSSFCell cell=sheet.getRow(i).createCell(1);
+					cell.setCellValue("Y");
+					//excelClose();
+					CellData = sheet.getRow(i).getCell(0).getStringCellValue();
+					break;
+				}				
+			}			
+			return CellData;	
+			
+		} catch (Exception e) {
+			return null;
+		}	
+	}
+public  int getRowUsed() throws Exception {
+			int RowCount = sheet.getLastRowNum()+1;
+			return RowCount;			
+
+		}
+public  void setCellData(String Result, int RowNum, int ColNum) throws Exception {
+		try {
+			Row = sheet.getRow(RowNum);			
+			if(Row==null)
+				Row = sheet.createRow(RowNum);			
+			Cell = Row.getCell(ColNum);
+			if (Cell == null) 
+				Cell = Row.createCell(ColNum);			
+				Cell.setCellValue(Result);
+		}
+		catch (Exception e) {
+			
+		}
+	}
+	public  void setCellData(String Result,int ColNum) throws Exception {
+		try {			
+			int rowCount=getRowUsed();
+			//System.out.println("total row "+rowCount);
+			for(int i=1;i<=rowCount;i++)
+			{
+				Cell = sheet.getRow(i).getCell(ColNum);
+				if(Cell==null)
+				{
+					XSSFCell cell=sheet.getRow(i).createCell(ColNum);
+					cell.setCellValue(Result);
+					excelClose();					
+					break;
+				}				
+			}
+		}
+		catch (Exception e) {
+			
+		}
+	}
+public void excelClose() throws IOException {
+							
+			FileOutputStream fileOut = new FileOutputStream(Constants.Excel_Test_Data_path_Mars);			
+			workbook.write(fileOut);
+			fileOut.close();
+	}
+public String updateCSVfile(String projectType)  {
+		  Reader fileReader;	     
+		  String csvString = null;
+		  String nonFalconProjectName = null;
+		  File baseCSV;
+		  FileWriter fw;		 
+		  baseCSV=new File(System.getProperty("user.dir")+"\\test_data\\Base_NI_Non_falcon.csv");	      
+	      try {
+	             fileReader = new FileReader(baseCSV);
+	             @SuppressWarnings("resource")
+	             BufferedReader bufReader = new BufferedReader(fileReader);	            
+	             fw = new FileWriter(System.getProperty("user.dir")+"\\test_data\\NI_Non_falcon.csv");	             
+	             StringBuilder sb = new StringBuilder();
+	             String line = bufReader.readLine();
+	             while(line!=null) {
+	                   sb.append(line).append("\n");
+	                   line = bufReader.readLine();	                                      
+	             }
+	             csvString=sb.toString();	
+	             nonFalconProjectName=projectNameForNonFalcon();	            
+	             csvString=csvString.replace("FTTP_NonFalcon",nonFalconProjectName);	 
+	             csvString=csvString.replace("Project_EndDate",getDate(4,"dd/MM/YYYY"));	   		  	
+	            // System.out.println(csvString);
+	             fw.write(csvString);
+	             fw.close();	            
+	      } catch (IOException e) {	                     
+	           System.out.println(e);
+	      } 
+	      return nonFalconProjectName;
+	  }
+//------------------------------------------------------------------------
+
+//*********** Actions class oprations**************************************
+
+Actions action = new Actions(driver);
+action.sendKeys(Keys.ARROW_DOWN).build().perform();  	// perform arrow down opration from keyboard
+action.sendKeys(Keys.ENTER).build().perform();			// hit enter key from keyboard
+action.moveToElement(element).click().build().perform(); // move to element and click
+action.dragAndDrop(From, To).perform();					//drag and drop
+
+//*********** Mobile testing functions**************************************
+
+public static IOSDriver<?> getDeviceConnection() throws MalformedURLException, InterruptedException {
+	public static DesiredCapabilities capabilities;
+	public static IOSDriver<?> driver;
+	public static String serverName;
+	public static String serverPort;
+	public static String serverIP;
+	public static WebDriverWait wait;
+	
+			capabilities = new DesiredCapabilities();
+			capabilities.setCapability("report.disable", true);
+			capabilities.setCapability("instrumentApp", true);
+			capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, serverName);
+			driver = new IOSDriver<>(new URL("http://localhost:4723/wd/hub"), capabilities);
+			//driver = new AndroidDriver(new URL("http://localhost:4723/wd/hub"), capabilities);
+			driver.executeScript("client:client.deviceAction(\"Home\")");
+			driver.setLogLevel(Level.INFO);
+			wait = new WebDriverWait(driver, 20);
+			System.out.println("IOS device launched to progress further");
+			Thread.sleep(2000);
+			return driver;		
+	}
