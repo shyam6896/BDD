@@ -1,0 +1,145 @@
+package stepLocators;
+
+import java.util.List;
+
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.How;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+
+import Utility.Applitool;
+import Utility.Configuration;
+//import Utility.Constants;
+import Utility.Excel_Test_Data;
+import Utility.Reports;
+
+public class Confirm_MDU_Ready_For_Build_Page extends Configuration
+{
+	
+	@FindBy (xpath = "//div[@class='confirmMDUReadyForBuild']//span[contains(text(),'Confirm MDU Ready For Build')]")
+    public WebElement elmConfirmMDUReady;
+	
+	@FindBy (xpath = "//mat-radio-group[@formcontrolname='ponServingMDU']//mat-radio-button[@class='mat-radio-button mat-accent' and @value='Yes']//div[@class='mat-radio-container']")
+    public WebElement radioBtnPONservingMDUYes;
+	
+	@FindBy (xpath = "//mat-radio-group[@formcontrolname='ponServingMDU']//mat-radio-button[@class='mat-radio-button mat-accent' and @value='No']//div[@class='mat-radio-container']")
+    public WebElement radioBtnPONservingMDUNo;
+	
+	@FindBy (xpath = "//mat-radio-group[@formcontrolname='spineCapacityAvailable']//mat-radio-button[@class='mat-radio-button mat-accent' and @value='Yes']//div[@class='mat-radio-container']")
+    public WebElement radioBtnSpineCapacityAvailableYes;
+	
+	@FindBy (xpath = "//mat-radio-group[@formcontrolname='spineCapacityAvailable']//mat-radio-button[@class='mat-radio-button mat-accent' and @value='No']//div[@class='mat-radio-container']")
+    public WebElement radioBtnSpineCapacityAvailableNo;
+	
+	@FindBy (xpath = "//mat-radio-group[@formcontrolname='headendMapping']//mat-radio-button[@class='mat-radio-button mat-accent' and @value='Yes']//div[@class='mat-radio-container']")
+    public WebElement radioBtnHeadendMappingYes;
+	
+	@FindBy (xpath = "//mat-radio-group[@formcontrolname='headendMapping']//mat-radio-button[@class='mat-radio-button mat-accent' and @value='No']//div[@class='mat-radio-container']")
+    public WebElement radioBtnHeadendMappingNo;
+	
+	@FindBy (xpath = "//input[@name='ponId']")
+    public WebElement txtponId;		
+	
+	@FindBy(how = How.XPATH, using = "//mat-select[@name='statusOfPON']")
+	public  WebElement dropdownStatusOfPON;		
+	
+	@FindBy(how = How.XPATH, using = "//mat-option[@class='mat-option']//span[text()='Not Planned']")
+	public  WebElement selectStatusOfPON_NotPlanned;
+	
+	@FindBy(how = How.XPATH, using = "//label[text()='WFMT PON project ID']//following::input[1]")
+	public  WebElement txtWFMTPONprojectID;
+	
+	@FindBy(how = How.XPATH, using = "//mat-option[@class='bt-auto-option mat-option ng-star-inserted mat-active']")
+	public  WebElement selectWFMTPONprojectID;	
+	
+	@FindBy(how = How.XPATH, using = "//span[text()=' Complete ']")
+	public  WebElement btnComplete;
+	
+	@FindBy(how = How.XPATH, using = "//input[contains(@placeholder,'Filter')]")
+	public  WebElement txtFilter;
+	
+	
+	
+	public Confirm_MDU_Ready_For_Build_Page(WebDriver driver)	{
+		//super(driver);
+		PageFactory.initElements(driver, this);
+	}
+	
+	//Applitool appli=new Applitool(driver);
+	JavascriptExecutor js=(JavascriptExecutor)driver;
+	NG_Project_Search_Page ps=new NG_Project_Search_Page(driver);
+	Salesforce_Portal_Open sfLogin=new Salesforce_Portal_Open(driver);
+	Salesforce_MDU_Page salesforce=new Salesforce_MDU_Page(driver);
+	NG_Open_Browser ng=new NG_Open_Browser(driver);
+	
+	
+	public void completeConfirm_MDU_Ready_For_BuildTaskWithNotPlanned(String SF_ProjID)
+	{
+		try {
+			waitForElementLoad(elmConfirmMDUReady);						
+			radioBtnPONservingMDUYes.click();
+			Thread.sleep(2000);
+			waitForElementLoad(txtponId);
+			txtponId.sendKeys("PON_Id123");
+			dropdownStatusOfPON.click();
+			Thread.sleep(2000);
+			selectStatusOfPON_NotPlanned.click();
+			if(prop.getProperty("envornment").equals("Mars"))
+			{
+				txtWFMTPONprojectID.click();
+				txtWFMTPONprojectID.sendKeys(prop.getProperty("WFMT_Project_ID_Mars"));
+				waitForElementLoad(selectWFMTPONprojectID);	
+				selectWFMTPONprojectID.click();
+			}
+			if(prop.getProperty("envornment").equals("Bacchus"))
+			{
+				txtWFMTPONprojectID.click();
+				txtWFMTPONprojectID.sendKeys(prop.getProperty("WFMT_Project_ID_Bacchus"));
+				waitForElementLoad(selectWFMTPONprojectID);	
+				selectWFMTPONprojectID.click();
+			}
+			report.reportPassEvent("Confirm MDU Ready For Build task is completed");
+			btnComplete.click();
+			Thread.sleep(2000);
+			waitForElementLoad(txtFilter);
+			ps.searchProject(SF_ProjID);
+			String taskName=ps.getQueueAndTaskName();
+			if(taskName.contains("Plan MDU Internals"))
+			{
+				System.out.println("Plan MDU Internals task is trigger successfully");
+				report.reportPassEvent("Plan MDU Internals task is trigger successfully");
+			}else {
+				report.reportFailEvent("Plan MDU Internals task is not trigger successfully");
+			}			
+		} catch (Exception e) {
+			System.out.println(e);
+			report.reportFailEvent("Confirm MDU Ready For Build task is not completed");
+		}
+	}
+	public void completeConfirm_MDU_Ready_For_BuildTask()
+	{
+		try {
+			waitForElementLoad(elmConfirmMDUReady);
+			radioBtnPONservingMDUNo.click();
+			radioBtnSpineCapacityAvailableYes.click();
+			radioBtnHeadendMappingNo.click();
+			report.reportPassEvent("Confirm MDU Ready For Build task is completed");
+			btnComplete.click();
+			Thread.sleep(2000);
+			waitForElementLoad(txtFilter);
+			
+		} catch (Exception e) {
+			System.out.println(e);
+			report.reportFailEvent("Confirm MDU Ready For Build task is not completed");
+		}
+		
+	}
+	
+}

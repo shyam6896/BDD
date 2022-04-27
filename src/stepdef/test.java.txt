@@ -1,0 +1,79 @@
+package StepDefinition;
+
+import Utility.Applitool;
+import Utility.CommonFunctions;
+import Utility.Configuration;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import stepLocators.EWOCS_Page;
+import stepLocators.NG_Open_Browser;
+import stepLocators.Salesforce_MDU_Page;
+import stepLocators.Salesforce_Portal_Open;
+
+public class CompleteSurveyReturnTaskWithResurveyRequired extends Configuration{
+	
+	public Salesforce_Portal_Open sf_portal;
+	public Salesforce_MDU_Page sf_mdu;
+	public NG_Open_Browser ngopen;
+	public CommonFunctions commonFn;	
+	public String scenarioName;
+	public String SF_ProjID;
+	//public static Applitool appli;
+
+	
+	@Given("^user open salesforce portal$")
+	public void user_open_salesforce_portal()  {
+		scenarioName=this.getClass().getSimpleName();
+		System.out.println("Scenario name :"+scenarioName);	
+		driver=loadDriver();
+		initializeReport(driver);		    
+	}
+
+	@When("^login with valid credentials$")
+	public void login_with_valid_credentials()  {
+		sf_portal=new Salesforce_Portal_Open(driver);
+		sf_portal.loginToSalesforce();
+	    
+	}
+
+	@Then("^select new MDU from MDU dropdown$")
+	public void select_new_MDU_from_MDU_dropdown()  {	   
+	    
+	}
+
+	@Then("^fill the all details and move project into insurvey stage$")
+	public void fill_the_all_details_and_move_project_into_insurvey_stage()  {
+		sf_mdu=new Salesforce_MDU_Page(driver);
+		SF_ProjID=sf_mdu.createMDU_Project();			
+		sf_mdu.InValidationFormDetails();
+		sf_mdu.inContactFormDetails();	    
+	}
+
+	@Then("^login to NGWFMT portal$")
+	public void login_to_NGWFMT_portal()  {
+		ngopen=new NG_Open_Browser(driver);
+		ngopen.loginToNGPortal();	    
+	}
+
+	@Then("^search SF project on NGWFMT and complete create survey estimate task$")
+	public void search_SF_project_on_NGWFMT_and_complete_create_survey_estimate_task()  {
+		commonFn=new CommonFunctions(driver);
+		commonFn.progressTask(2, SF_ProjID, "Resurvey");	    
+	}
+
+	@Then("^Survey return task will triggered$")
+	public void survey_return_task_will_triggered()  {	   
+	    
+	}
+
+	@Then("^select Resurvey Required and Complete Survey Return task$")
+	public void select_Resurvey_Required_and_Complete_Survey_Return_task()  {	   
+	    
+	}
+
+	@Then("^Create Survey Estimate task will be triggered again$")
+	public void create_Survey_Estimate_task_will_be_triggered_again()  {	   
+	    
+	}	
+}

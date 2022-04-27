@@ -1,0 +1,300 @@
+package Utility;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class Excel_Test_Data {
+	
+	private XSSFWorkbook workbook;
+	private XSSFSheet sheet;
+	public static String estimateType;
+	public static String env;
+	public static String templateName;
+	public static String currentRelease;
+	
+	public Excel_Test_Data()
+	{
+		try {
+			//FileInputStream input=new FileInputStream(Constants.Excel_path_Control_Sheet);
+		//	workbook=new XSSFWorkbook(input);
+			sheet=workbook.getSheet("ControlSheet");
+			//estimateType=sheet.getRow(1).getCell(1).getStringCellValue();
+		
+		} catch (Exception e) {
+			System.out.println(e);			
+		}
+	}
+	
+	public String getEnvDetail()
+	{		
+		sheet=workbook.getSheet("ControlSheet");			
+		env=sheet.getRow(1).getCell(0).getStringCellValue();		
+		return env;
+	}
+	
+	public String getProgramCode()
+	{
+		String ProgramCode=null;
+		sheet=workbook.getSheet(env);		
+		ProgramCode=sheet.getRow(1).getCell(1).getStringCellValue();		
+		System.out.println("program Code :- "+ProgramCode);
+		return ProgramCode;
+	}
+	public String getTemplateCode()
+	{
+		String TemplateCode=null;
+		sheet=workbook.getSheet(env);		
+		TemplateCode=sheet.getRow(2).getCell(1).getStringCellValue();		
+		System.out.println("Template Code :- "+TemplateCode);
+		return TemplateCode;
+	}
+	public String getBudgetOUCCode()
+	{
+		String BudgetOUCCode=null;
+		sheet=workbook.getSheet(env);		
+		BudgetOUCCode=sheet.getRow(3).getCell(1).getStringCellValue();		
+		System.out.println("Budget OUC Code :- "+BudgetOUCCode);
+		return BudgetOUCCode;
+	}
+	public String getExchangeName()
+	{
+		String ExchangeName=null;
+		sheet=workbook.getSheet(env);		
+		ExchangeName=sheet.getRow(4).getCell(1).getStringCellValue();		
+		System.out.println("Exchange Name :- "+ExchangeName);
+		return ExchangeName;
+	}
+	public String getSyntheticCode()
+	{
+		String SyntheticCode=null;
+		sheet=workbook.getSheet(env);		
+		SyntheticCode=sheet.getRow(5).getCell(1).getStringCellValue();		
+		System.out.println("Synthetic Code :- "+SyntheticCode);
+		return SyntheticCode;
+	}
+	
+	public String getResourceCode()
+	{
+		String ResourceCode=null;
+		sheet=workbook.getSheet(env);		
+		ResourceCode=sheet.getRow(6).getCell(1).getStringCellValue();		
+		System.out.println("Resource Code :- "+ResourceCode);
+		return ResourceCode;
+	}
+	/*public String getEstimateType()
+	{
+		sheet=workbook.getSheet("ControlSheet");
+		estimateType=sheet.getRow(1).getCell(1).getStringCellValue();
+		return estimateType;		
+	}
+	public String getTemplateName()
+	{
+		sheet=workbook.getSheet("EAD");
+		templateName=sheet.getRow(1).getCell(1).getStringCellValue();
+		return templateName;		
+	}
+	public String getCurrentRelease()
+	{
+		sheet=workbook.getSheet("EAD");
+		currentRelease=sheet.getRow(2).getCell(1).getStringCellValue();
+		return currentRelease;		
+	}
+	
+	public String getSchemeTitle()
+	{
+		String SchemeTitle=null;
+		System.out.println("Env:- "+env);
+		sheet=workbook.getSheet(env);
+		estimateType=getEstimateType();
+		if(estimateType.equalsIgnoreCase("ID"))
+		{
+			SchemeTitle=sheet.getRow(1).getCell(1).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("BCD"))
+		{
+			SchemeTitle=sheet.getRow(1).getCell(2).getStringCellValue();
+		}
+		System.out.println("Esimate Title :- "+SchemeTitle);
+		return SchemeTitle;
+	}
+	
+	public String get1141Code()
+	{
+		String s1141Code=null;
+		sheet=workbook.getSheet(env);
+		if(estimateType.equalsIgnoreCase("ID"))
+		{
+			s1141Code=sheet.getRow(2).getCell(1).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("BCD"))
+		{
+			s1141Code=sheet.getRow(2).getCell(2).getStringCellValue();
+		}
+		System.out.println("1141 Code :- "+s1141Code);
+		return s1141Code;
+	}*/
+	
+	
+	
+	/*public String getAEndLocation()
+	{
+		String AEndLocation=null;
+		sheet=workbook.getSheet(env);
+		if(estimateType.equalsIgnoreCase("ID"))
+		{
+			AEndLocation=sheet.getRow(4).getCell(1).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("BCD"))
+		{
+			AEndLocation=sheet.getRow(4).getCell(2).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("EAD"))
+		{
+			AEndLocation=sheet.getRow(4).getCell(1).getStringCellValue();
+		}
+		System.out.println("A End Location ;- "+AEndLocation);
+		return AEndLocation;
+	}
+	
+	public String getBEndLocation()
+	{
+		String BEndLocation=null;
+		sheet=workbook.getSheet(env);
+		if(estimateType.equalsIgnoreCase("ID"))
+		{
+			BEndLocation=sheet.getRow(5).getCell(1).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("BCD"))
+		{
+			BEndLocation=sheet.getRow(5).getCell(2).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("EAD"))
+		{
+			BEndLocation=sheet.getRow(5).getCell(1).getStringCellValue();
+		}
+		System.out.println("B End Location ;- "+BEndLocation);
+		return BEndLocation;
+	}
+	
+	public String getJobDescription()
+	{
+		String JobDescription=null;
+		sheet=workbook.getSheet(env);
+		if(estimateType.equalsIgnoreCase("ID"))
+		{
+			JobDescription=sheet.getRow(6).getCell(1).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("BCD"))
+		{
+			JobDescription=sheet.getRow(6).getCell(2).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("EAD"))
+		{
+			JobDescription=sheet.getRow(6).getCell(1).getStringCellValue();
+		}
+		System.out.println("Job Description :- "+JobDescription);
+		return JobDescription;
+	}	
+	public String getNPGCode()
+	{
+		String NPGCode=null;
+		sheet=workbook.getSheet(env);
+		if(estimateType.equalsIgnoreCase("ID"))
+		{
+			NPGCode=sheet.getRow(9).getCell(1).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("BCD"))
+		{
+			NPGCode=sheet.getRow(9).getCell(2).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("EAD"))
+		{
+			NPGCode=sheet.getRow(9).getCell(1).getStringCellValue();
+		}
+		System.out.println("NPG Code :- "+NPGCode);
+		return NPGCode;
+	}
+	
+	public String getExactLocation()
+	{
+		String ExactLocation=null;
+		sheet=workbook.getSheet(env);
+		if(estimateType.equalsIgnoreCase("ID"))
+		{
+			ExactLocation=sheet.getRow(10).getCell(1).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("BCD"))
+		{
+			ExactLocation=sheet.getRow(10).getCell(2).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("EAD"))
+		{
+			ExactLocation=sheet.getRow(10).getCell(1).getStringCellValue();
+		}
+		System.out.println("Location :- "+ExactLocation);
+		return ExactLocation;
+	}
+	
+	public String getGridMap()
+	{
+		String GridMap=null;
+		sheet=workbook.getSheet(env);
+		if(estimateType.equalsIgnoreCase("ID"))
+		{
+			GridMap=sheet.getRow(11).getCell(1).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("BCD"))
+		{
+			GridMap=sheet.getRow(11).getCell(2).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("EAD"))
+		{
+			GridMap=sheet.getRow(11).getCell(1).getStringCellValue();
+		}
+		System.out.println("Grid Map :- "+GridMap);
+		return GridMap;
+	}
+	
+	public String getAssetID()
+	{
+		String AssetID=null;
+		sheet=workbook.getSheet(env);
+		if(estimateType.equalsIgnoreCase("ID"))
+		{
+			AssetID=sheet.getRow(12).getCell(1).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("BCD"))
+		{
+			AssetID=sheet.getRow(12).getCell(2).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("EAD"))
+		{
+			AssetID=sheet.getRow(12).getCell(1).getStringCellValue();
+		}
+		System.out.println("Asset ID :- "+AssetID);
+		return AssetID;
+	}
+	
+	public String getAssetDescription()
+	{
+		String AssetDescription=null;
+		sheet=workbook.getSheet(env);
+		if(estimateType.equalsIgnoreCase("ID"))
+		{
+			AssetDescription=sheet.getRow(13).getCell(1).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("BCD"))
+		{
+			AssetDescription=sheet.getRow(13).getCell(2).getStringCellValue();
+		}
+		if(estimateType.equalsIgnoreCase("EAD"))
+		{
+			AssetDescription=sheet.getRow(13).getCell(1).getStringCellValue();
+		}
+		System.out.println("Asset Description :- "+AssetDescription);
+		return AssetDescription;
+	}*/
+}

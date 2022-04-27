@@ -1,0 +1,55 @@
+
+browser = Chrome
+envornment= Mars
+#envornment= Bacchus
+
+#urlMDU = 
+urlMDU = 
+#urlNG = 
+usernameMDU = 
+passwordMDU = 
+
+EwocsURL_Mars = 
+EwocsURL_Bacchus = 
+EwocsUser_Mars = 
+EwocsPwd_Mars = 
+EwocsUser_Bacchus = 
+EwocsPwd_Bacchus = 
+    
+NG_URL_Mars = 
+NG_URL_Bacchus = 
+NG_User_Mars = 
+NG_Pwd_Mars = 
+NG_User_Bacchus = 
+NG_Pwd_Bacchus = 
+
+#Salesforce data
+PostCode = NH1 8HL
+Code1141 = L/TUD
+Deployment_QTR= 19/20 Q4
+WFMT_Project_ID_Mars= BXAUC
+WFMT_Project_ID_Bacchus= 64EEE
+
+#NG data
+ProgramCode = B003
+TemplateCode = B1
+SyntheticCode = NI4A
+Resource_Code_Mars = 99909199
+Resource_Code_bacchus = 99908199
+NPG_code = NIL
+
+civils = Civils - General
+
+
+SurveyComm = Project Created
+SurveyOutcome = Project Cancelled
+
+
+PONCAbNode = mynode
+DeploymentQTR = 18/19 Q3
+
+EstimateNumber = 456321
+DummyProject = IS01695	
+
+
+

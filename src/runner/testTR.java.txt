@@ -1,0 +1,65 @@
+package TestRunnerClass;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.junit.runner.RunWith;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import Utility.CommonFunctions;
+import Utility.Configuration;
+
+import Utility.Reports;
+import cucumber.api.CucumberOptions;
+import cucumber.api.junit.Cucumber;
+import cucumber.api.testng.CucumberFeatureWrapper;
+import cucumber.api.testng.TestNGCucumberRunner;
+import cucumber.runtime.CucumberException;
+import stepLocators.CreateSurveyEstimatePage;
+import stepLocators.EWOCS_Page;
+import stepLocators.NG_Open_Browser;
+import stepLocators.NG_Project_Search_Page;
+import stepLocators.Salesforce_MDU_Page;
+import stepLocators.Salesforce_Portal_Open;
+import stepLocators.SurveyRuturnPage;
+
+@RunWith(Cucumber.class)
+
+@CucumberOptions(features = "src/Feature/Check_Quality_Issue_Identified_In_SurveyReturn.feature", glue = { "StepDefinition" }, plugin = { "pretty",
+		 "html:target/cucumber-reports/cucumber-pretty"}, monochrome = true)
+
+public class Check_Quality_Issue_Identified_In_SurveyReturn_TR extends Configuration{
+private static TestNGCucumberRunner testNGCucumberRunner;
+	
+	@BeforeClass(alwaysRun = true)
+	public void setUpClass() throws Exception {
+		testNGCucumberRunner = new TestNGCucumberRunner(this.getClass());
+	}		
+
+	@Test(groups = "cucumber", description = "Runs Cucumber Feature", dataProvider = "features")
+	public void feature(CucumberFeatureWrapper cucumberFeature) {
+		try{
+		testNGCucumberRunner.runCucumber(cucumberFeature.getCucumberFeature());
+		}catch(CucumberException e){
+			System.out.println("Test Case Failed");
+			   report.reportFailEvent("Test Case Failed");	
+			}		
+	}
+
+	@DataProvider
+	public Object[][] features() {
+		return testNGCucumberRunner.provideFeatures();
+	}
+	
+    @AfterClass(alwaysRun = true)	
+    public void tearDownClass() {
+    	System.out.println("Aftre class");
+        testNGCucumberRunner.finish();
+ 	    report.endReport();
+ 	    System.out.println("Report generated");	 
+    }	
+}

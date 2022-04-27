@@ -1,0 +1,283 @@
+package Utility;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.How;
+
+import stepLocators.Confirm_MDU_Ready_For_Build_Page;
+//import stepLocators.CaptureFibreLightLossPage;
+import stepLocators.CreateSurveyEstimatePage;
+import stepLocators.EWOCS_Page;
+//import stepLocators.DataIntegrityCheckPage;
+//import stepLocators.DeterminePlanningAndBuildResourcePage;
+//import stepLocators.FinalPublishPostBuildPage;
+//import stepLocators.High_Cost_CivilsPage;
+//import stepLocators.ILC_Planning_Approval_Page;
+//import stepLocators.ILC_Planning_Completion_Page;
+import stepLocators.MasterPage;
+import stepLocators.NG_Open_Browser;
+import stepLocators.NG_Project_Search_Page;
+import stepLocators.Plan_MDU_Internals_Page;
+import stepLocators.Salesforce_MDU_Page;
+import stepLocators.Salesforce_Portal_Open;
+//import stepLocators.OLT_OCR_OLT_ODF_Mapping;
+//import stepLocators.PONQualityCheckPage;
+//import stepLocators.PlanFTTPNetworkEquipmentsPage;
+/*//import stepLocators.PlanFTTPNetworkNIMSJobPage;
+import stepLocators.PostSurveyCivilsCostingPage;
+import stepLocators.PostSurveyCostingPage;
+import stepLocators.PostSurveyPlanningPage;
+import stepLocators.QGFinalPublishPage;
+import stepLocators.SurveyQualityCheckPage;
+import stepLocators.TrackMobilePlanningPage;
+import stepLocators.TriggerPONCommissioningPage;*/
+import stepLocators.SurveyRuturnPage;
+import stepLocators.TakeoverFromSID_Page;
+
+public class CommonFunctions extends MasterPage{
+
+	@FindBy(how = How.XPATH, using = "//div[@class='panel-group']//span[text()='Queues']")
+	public  WebElement lnkQueue;	
+	
+	@FindBy(how = How.XPATH, using = "(//div[@id='ngaDefaultWorkitemsListDataBTNGGrid'])//div[@tooltip='Search']")
+	public  WebElement btnTaskSearch;	
+	
+	@FindBy(how = How.XPATH, using = "(//div[@id='ngaDefaultWorkitemsListDataBTNGGrid'])//input[@id='filterText']")
+	public  WebElement txtSearch;
+	
+	@FindBy(how = How.XPATH, using = "//div[@id='ngaDefaultWorkitemsListDataBTNGGrid']//div[@ng-show='showMenu']")
+	public  WebElement searchPanel;
+	
+	@FindBy(how = How.XPATH, using = "(//div[@ng-repeat='row in renderedRows']/div[2]//span)[1]")
+	public  WebElement elmTaskName;
+	
+	@FindBy(how = How.XPATH, using = ".//h4//span[text()='Menu']/ancestor::a")
+	public WebElement lnkMenu;
+	
+	@FindBy(how = How.XPATH, using = "//div[@class='panel-collapse in']//div[text()='Project Search']")
+	public WebElement lnkProjectSearch;
+	
+	@FindBy(how = How.XPATH, using = "//input[@id='projectId']")
+	public WebElement txtProjectID;
+	
+	@FindBy(how = How.XPATH, using = "//button[@id='projectCancelButton']")
+	public WebElement btnProjSearch;
+	
+	@FindBy(how = How.XPATH, using = "//div[@class='panel-collapse in']//div[text()='Project Loader']")
+	public WebElement lnkProjectLoader;
+	
+	@FindBy(how = How.XPATH, using = "//div[@class='panel-collapse in']//div[text()='Project Builder']")
+	public WebElement lnkProjectBuilder;
+	
+	@FindBy(how = How.XPATH, using = "(//div[text()='Project Loader'])[2]")
+	public WebElement elmProjectLoader;
+	
+	@FindBy(how = How.XPATH, using = "//select[@id='projectLoderType']")
+	public WebElement lstProjectLoaderType; 
+	
+	@FindBy(how = How.XPATH, using = "//div[@ng-show='showNormalProjectLoader']//button[@id='projectLoaderButton']")
+	public WebElement btnProjLoader;
+	
+	@FindBy(how = How.XPATH, using = "//div[@ng-show='showNormalProjectLoader']//div[@class='row']//b[text()='CSV uploaded successfully']")
+	public WebElement eleCSVUploadMsg;
+	
+	@FindBy(how = How.XPATH, using = "(//div[text()='Project Builder'])[2]")
+	public WebElement eleProjectBuilder;
+	
+	@FindBy(how = How.XPATH, using = "(//div[text()='Project Builder'])[2]/following::input[@id='projectName']")
+	public WebElement txt_ProjectName;
+	
+	@FindBy(how = How.XPATH, using = "//select[@id='projectType']")
+	public WebElement lstProjectType; //FTTC
+	
+	@FindBy(how = How.XPATH, using = "//select[@id='projectSubType']")
+	public WebElement lstProjectSubType;
+	
+	@FindBy(how = How.XPATH, using = "//div[@ng-show='showNormalProjectLoader']//input[@id='projectUploadFile']")
+	public WebElement txtProjectUploadFile;
+	
+	@FindBy(how = How.XPATH, using = "//button[@id='projectLoaderButton']")
+	public WebElement btnProjectLoader;
+	
+	@FindBy(how = How.XPATH, using = "//button[@id='projectSearchButton']")
+	public WebElement btnProjectSearch;
+	
+	@FindBy(how = How.XPATH, using = "//button[@id='projectBuilderConfirmProjects']")
+	public WebElement btnProjectBuilderConfirm;
+	
+	@FindBy(how = How.XPATH, using = "//span[text()='FTTP']")
+	public WebElement ProjectBuilderResult;
+	
+	@FindBy(how = How.XPATH, using = "//button[@id='buildProjects']")
+	public WebElement btnBuildProjects;
+	
+	@FindBy(how = How.XPATH, using = "//div[contains(text(),'Project(s) created successfully')]")
+	public WebElement elmProjectCreatedMsg;
+	
+	@FindBy(how = How.XPATH, using = "//label[text()='Project ID']//following::input[1]")
+	public WebElement txtProjectIdData;
+	
+	@FindBy(how = How.XPATH, using = "(//ul[@class='dropdown-menu']//parent::li)[1]")
+	public  WebElement drop_clk;
+	
+	@FindBy(how = How.XPATH, using = "//strong[@class = 'ng-binding'][contains(text() , 'NGA2')]")
+	public  WebElement selNGA2;
+	
+	@FindBy(how = How.XPATH, using = "//strong[@class = 'ng-binding'][contains(text() , 'Next Generation Access')]")
+	public  WebElement drop_sel;
+	
+	@FindBy(how = How.XPATH, using = "//div[@class='ngTotalSelectContainer']//span[contains(text(),'Total Items')]")
+	public WebElement elmTotalTaskItem;
+	
+	@FindBy(how = How.XPATH, using = "//div[@ng-repeat='row in renderedRows']/div[4]//span")
+	public  WebElement elmProjStatus;
+	
+	@FindBy(how = How.XPATH, using = "//div[text()='Task Status']")
+	public  WebElement elmTaskStatus;
+	
+	
+	
+	public CommonFunctions(WebDriver driver) {
+		super(driver);	
+	}
+	
+	public String NG_projID;
+	public String estimateNo;
+	NG_Project_Search_Page searchPage=new NG_Project_Search_Page(driver);	
+	CreateSurveyEstimatePage cse=new CreateSurveyEstimatePage(driver);	
+	SurveyRuturnPage SR=new SurveyRuturnPage(driver);
+	EWOCS_Page ewocs=new EWOCS_Page(driver);
+	NG_Open_Browser ng=new NG_Open_Browser(driver);
+	Salesforce_MDU_Page salesforce=new Salesforce_MDU_Page(driver);
+	Salesforce_Portal_Open sfLogin=new Salesforce_Portal_Open(driver);
+	TakeoverFromSID_Page takeOverSID=new TakeoverFromSID_Page(driver);
+	Confirm_MDU_Ready_For_Build_Page confirm_MDU=new Confirm_MDU_Ready_For_Build_Page(driver);
+	Plan_MDU_Internals_Page planMDUinternal =new Plan_MDU_Internals_Page(driver);
+	//Applitool appli=new Applitool(driver);
+	
+	
+	public void progressTask(int loopCount,String SF_projID,String text)	
+	{
+		try {
+			//verifyNGA2Dashboard();
+			//System.out.println("task length "+allTaskList.length);
+			String taskAndQueueName=null;
+			for(int j=1;j<=loopCount;j++)			
+			{
+				NG_projID=searchPage.searchProject(SF_projID);				
+				int i=0;
+				while(i<10)
+				{
+					i++;
+					taskAndQueueName=searchPage.getQueueAndTaskName();
+					if(taskAndQueueName==null)
+					{
+						searchPage.searchProject(SF_projID);						
+					}else {
+						break;
+					}
+					if(i==10) {
+						report.reportFailEvent("Next Task is not found for project "+SF_projID);
+					}
+				}				
+				String [] strArr=taskAndQueueName.split(":");
+				String taskName=strArr[0];
+				String queueName=strArr[1];
+				searchPage.searchTaskInQueue(queueName,taskName,NG_projID);				
+				switch(taskName)
+				{
+					case "Create Survey Estimate":	
+						estimateNo=cse.completeCreateSurveyEstimateTask();
+						ewocs.closeEstimate(estimateNo);
+						ng.loginToNGPortal();
+						break;						
+					case "Survey Return":							
+						SR.completeSurveyReturnTask(SF_projID,text);						
+						break;
+					case "Takeover from SID":	
+						if(text.equalsIgnoreCase("Reject"))	{
+							takeOverSID.completeTakeoverFromSIDTaskWithRejection(SF_projID);
+						}
+						else {
+							takeOverSID.completeTakeoverFromSIDTask();
+						}
+						break;
+					case "Confirm MDU Ready For Build":	
+						if(text.equalsIgnoreCase("NotPlanned"))	{
+							confirm_MDU.completeConfirm_MDU_Ready_For_BuildTaskWithNotPlanned(SF_projID);
+						}
+						else {
+							confirm_MDU.completeConfirm_MDU_Ready_For_BuildTask();
+						}
+						break;
+					case "Plan MDU Internals":							
+						planMDUinternal.completePlan_MDU_InternalsTask(SF_projID,text);						
+						break;
+				}
+			}				
+		  }
+		 catch (Exception e) {
+			 System.out.println(e);
+			 report.reportFailEvent(e.getMessage());
+		}		
+	}
+	
+	public void verifyNGA2Dashboard()	{	
+		try {
+			waitForPageLoaded();
+			if(driver.findElements(By.xpath("//ul[@class='navbar-nav']//span[text()='NGA2']")).size()>0)
+			{
+				String str=driver.findElement(By.xpath("//ul[@class='navbar-nav']//span[text()='NGA2']")).getText();
+				System.out.println(str);				
+			}
+			else if(driver.findElements(By.xpath("//ul[@id='perspectiveGroupDivId']")).size()>0)
+			{
+					drop_clk.click();
+					Thread.sleep(1000);
+					selNGA2.click();
+				
+			}
+			else if (driver.findElements(By.xpath("//ul[@class='navbar-nav']//span[text()='TCP']")).size()>0)
+			{
+				driver.findElement(By.xpath("//ul[@class='navbar-nav']//span[text()='TCP']")).click();
+				Thread.sleep(1000);
+				driver.findElement(By.xpath("//div[@class='dropdown-menu dropdown-menu-right show']//a[text()='NGA2']")).click();
+			}
+			else if (driver.findElements(By.xpath("//span[@class='mat-button-wrapper']//p[text()='Dig & Aux']")).size()>0)
+			{
+				driver.findElement(By.xpath("//span[@class='mat-button-wrapper']//p[text()='Dig & Aux']")).click();
+				Thread.sleep(1000);
+				driver.findElement(By.xpath("//div[@class='mat-menu-content']//a[text()='NGA2']")).click();
+			}			
+			else {
+				System.out.println("Unable to select NGA2 product from dashboard");			
+				report.reportFailEvent("Unable to select NGA2 product from dashboard");	
+			}
+		} 
+		catch (Exception e) {
+			System.out.println(e);
+			report.reportFailEvent("User unable to locate Ethernet dashboard");
+		}		
+	}
+	
+}

@@ -1,0 +1,262 @@
+package Utility;
+
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.MediaEntityBuilder;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+import com.google.common.io.Files;
+
+import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.Screenshot;
+import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
+
+public class Reports {
+	public static Reports report = new Reports();
+	public static ExtentReports eReport;
+	public static ExtentTest logger;
+	public WebDriver driver;
+	private String testName;
+	private String reportFolder;
+	private String timeStamp;
+	private String reportFile;
+	private String screenshotFolder;
+	private String screenshotFolderFail;
+	private String screenshotFolderPass;
+
+	private Reports() {
+
+	}
+
+	public Reports startReport() {
+		setReportPath();
+		eReport = new ExtentReports();
+		ExtentHtmlReporter reporter = new ExtentHtmlReporter(reportFile);
+		eReport.attachReporter(reporter);
+		logger = eReport.createTest(testName);
+		reporter.config().setTheme(Theme.DARK);
+		reporter.config().setDocumentTitle("FTTP BF AUTOMATION REPORT");
+		reporter.config().setReportName("MDU_Test Automation");
+		eReport.setSystemInfo("User Name", System.getProperty("user.name"));
+		eReport.setSystemInfo("Time Zone", System.getProperty("user.timezone"));
+		eReport.setSystemInfo("Machine", "Windows 10" +" "+ "64 Bit");
+		eReport.setSystemInfo("Selenium", "3.7.0");
+		eReport.setSystemInfo("Maven", "3.5.2");
+		eReport.setSystemInfo("Java Version", System.getProperty("java.version"));
+		return this;
+	}
+
+	private void setReportPath() {
+		try {
+
+			timeStamp = fn_getDateTime();
+			reportFolder = System.getProperty("user.dir") + File.separator + "reports" + File.separator + testName + "_"
+					+ timeStamp;
+			reportFile = reportFolder + File.separator + testName + "_" + timeStamp + ".html";
+			//reportFile = "C:\\Users\\611216999\\Selenium\\EAD_EstimateCreation\\reports\\output.html";
+			screenshotFolderPass = reportFolder + File.separator + "screenshots" + File.separator + "Passed";
+			screenshotFolderFail = reportFolder + File.separator + "screenshots"+ File.separator + "Failed";
+			
+			File screensFdr = new File(screenshotFolderPass);
+			screensFdr.mkdirs();
+			
+			File screensFd1r = new File(screenshotFolderFail);
+			screensFd1r.mkdirs();
+			
+		} catch (Exception ex) {
+			//ex.printStackTrace();
+		}
+	}
+
+	private String fn_getDateTime() {
+		try {
+			DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH-mm-ss");
+			Date date = Calendar.getInstance().getTime();
+			String currentDate = dateFormat.format(date);
+			return currentDate;
+		} catch (Exception ex) {
+			//ex.printStackTrace();
+			reportFailEvent("Unable to take the screenshot at this time");
+		}
+		return null;
+	}
+	
+	public void fn_takeScreenShot_fail() {
+		try {
+//			TakesScreenshot scrShot = ((TakesScreenshot) driver);
+//			File srcFile = scrShot.getScreenshotAs(OutputType.FILE);
+//			File destFile = new File(screenshotFolder + File.separator + fn_getDateTime() + ".jpg");
+//			FileUtils.copyFile(srcFile, destFile);
+			
+			System.out.println("Taking screenshot of Failure"); 	 
+	  		  
+			File sourcePath = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+  
+			File destinationPath = new File(screenshotFolder + File.separator + fn_getDateTime()+ ".png"); 
+			FileUtils.copyFile(sourcePath,destinationPath);	  
+			driver.quit();
+		} catch (Exception ex) {
+			//System.out.println(ex.getMessage());
+			reportFailEvent("Unable to capture the screenshot");
+		}
+	}
+	
+//	public void fn_getFullScreenshot() {
+//		String StrScreenshotPath = screenshotFolder + File.separator + fn_getDateTime() + ".png";
+//		//System.out.println(StrScreenshotPath);
+//		try {
+//			Screenshot screenshot=new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).takeScreenshot(driver);
+//			ImageIO.write(screenshot.getImage(),"PNG",new File(StrScreenshotPath));
+//		} catch (Exception ex) {
+//			//ex.printStackTrace();
+//			reportWarningEvent("Unable to capture the screenshot");
+//		}
+//		
+//	}
+	public void fn_takeScreenShotPass(String fileName) {
+		try {
+			
+			System.out.println("Taking screenshot of success"); 
+			TakesScreenshot scrShot = ((TakesScreenshot) driver);
+			File srcFile = scrShot.getScreenshotAs(OutputType.FILE);
+			File destFile = new File(screenshotFolderPass + File.separator + fileName.replaceAll("[^a-zA-Z0-9]", "_") + "_"
+					+ fn_getDateTime() + ".jpg");
+			FileUtils.copyFile(srcFile, destFile);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			reportWarningEvent("Unable to capture the screenshot");
+		}
+	}
+	
+	public void fn_takeScreenShotFail(String fileName) {
+		try {
+			
+			System.out.println("Taking screenshot taken of failure"); 
+			TakesScreenshot scrShot = ((TakesScreenshot) driver);
+			File srcFile = scrShot.getScreenshotAs(OutputType.FILE);
+			File destFile = new File(screenshotFolderFail + File.separator + fileName.replaceAll("[^a-zA-Z0-9]", "_") + "_"
+					+ fn_getDateTime() + ".jpg");
+			FileUtils.copyFile(srcFile, destFile);
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			reportWarningEvent("Unable to capture the screenshot");
+		}
+	}
+	
+//	public void fn_getFullScreenshot(String fileName) {
+//		String StrScreenshotPath = screenshotFolder + File.separator + fileName.replaceAll("[^a-zA-Z0-9]", "_") + "_"+ fn_getDateTime() + ".png";
+//		//System.out.println(StrScreenshotPath);
+//		try {
+//			Screenshot screenshot=new AShot().shootingStrategy(ShootingStrategies.viewportPasting(1000)).takeScreenshot(driver);
+//			ImageIO.write(screenshot.getImage(),"PNG",new File(StrScreenshotPath));
+//		} catch (Exception ex) {
+//			ex.printStackTrace();
+//			reportWarningEvent("Unable to capture the screenshot");
+//		}
+//		
+//	}
+	
+	
+
+	
+		public void fn_takeScreenShotFromRobotclass(String fileName) {
+				try {
+					
+					System.out.println("Taking screenshot taken");				
+					//create object of Robot class
+					Robot robot =new Robot();
+					Rectangle screenSize = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+					
+					// Capturing screenshot by providing size
+		            BufferedImage tmp = robot.createScreenCapture(screenSize); 
+		            String path=screenshotFolderPass + File.separator + fileName.replaceAll("[^a-zA-Z0-9]", "_") + "_"
+							+ fn_getDateTime() + ".png";
+		            // To copy temp image in to permanent file
+		            ImageIO.write(tmp, "png",new File(path)); 
+					
+				} catch (Exception ex) {
+					System.out.println(ex.getMessage());
+					reportWarningEvent("Unable to capture the screenshot");
+				}
+			} 
+		 
+
+	
+	public WebDriver getDriver() {
+		return driver;
+	}
+
+	public String getTestName() {
+		return testName;
+	}
+
+	public void setDriver(WebDriver driver) {
+		this.driver = driver;
+	}
+
+	public void setTestName(String testName) {
+		this.testName = testName;
+	}
+
+	public static Reports getReportInstance() {
+		if (report == null)
+			return new Reports();
+		return report;
+	}
+
+	public void reportPassEvent(String stepName) {
+		logger.log(Status.PASS, stepName);
+		fn_takeScreenShotPass(stepName);
+	}
+
+	public void reportInfoEvent(String stepName) {
+		logger.log(Status.INFO, stepName);
+		//fn_takeScreenShot(stepName);
+	}
+
+//	public void reportFailEvent(String stepName)throws InvalidE {
+		public void reportFailEvent(String stepName){
+		logger.log(Status.FAIL, stepName);
+	//	fn_takeScreenShot_fail();
+		fn_takeScreenShotFail(stepName);
+		Assert.fail(stepName);
+	//	throws new InvalidE("Button not clicked");
+		}
+
+	public void reportWarningEvent(String stepName) {
+		logger.log(Status.WARNING, stepName);
+		//fn_takeScreenShot();
+		Assert.fail(stepName);
+	}
+
+	public void endReport() {
+		try {
+			eReport.flush();
+			driver.quit();
+		} catch (Exception ex) {
+//			ex.getMessage();
+//			ex.printStackTrace();
+		}
+	}
+	
+
+}

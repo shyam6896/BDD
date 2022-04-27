@@ -1,0 +1,203 @@
+package Utility;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class ExcelTest {
+
+	private  XSSFCell Cell = null;
+	private  XSSFRow Row = null;
+	private  XSSFSheet sheet;
+	private  XSSFWorkbook workbook;	
+	public static Reports report;
+	private FileInputStream fis;
+	private FileOutputStream fileOut;
+	private String env;
+
+	public ExcelTest()  {
+		try {	
+			Excel_Test_Data TD=new Excel_Test_Data();
+			env=TD.getEnvDetail();
+			  if (env.equals("Mars"))
+				{
+				 // fis = new FileInputStream(Constants.Excel_Test_Data_path_Mars);
+				 				 
+				}
+				if (env.equals("Bacchus"))
+				{
+				//	fis = new FileInputStream(Constants.Excel_Test_Data_path_Bacchus);
+				}
+				 workbook = new XSSFWorkbook(fis);
+				// sheet=workbook.getSheet(TD.getEstimateType());
+			 
+		} catch (Exception e) {
+		     	
+		}
+	}
+
+	public  String getCellData() throws Exception {
+		//int RowNum, int ColNum
+		try {
+			String CellData=null;
+			int rowCount=getRowUsed();
+			System.out.println("total row "+rowCount);
+			for(int i=1;i<=rowCount;i++)
+			{
+				Cell = sheet.getRow(i).getCell(1);
+				if(Cell==null)
+				{
+					XSSFCell cell=sheet.getRow(i).createCell(1);
+					cell.setCellValue("Y");
+					//excelClose();
+					CellData = sheet.getRow(i).getCell(0).getStringCellValue();
+					break;
+				}				
+			}
+			//System.out.println("Estimate no "+CellData);
+			return CellData;	
+			
+		} catch (Exception e) {
+			return null;
+		}	
+	}
+
+	public  String getCellDataForEAD() throws Exception {
+		//int RowNum, int ColNum
+		try {
+			String CellData=null;
+			int rowCount=getRowUsed();
+			//System.out.println("total row "+rowCount);
+			for(int i=1;i<=rowCount;i++)
+			{
+				Cell = sheet.getRow(i).getCell(1);
+				if(Cell==null)
+				{
+					CellData = sheet.getRow(i).getCell(0).getStringCellValue();
+					break;
+				}				
+			}
+			System.out.println("Cell Value "+CellData);
+			return CellData;	
+			
+		} catch (Exception e) {
+			return null;
+		}	
+	}
+	public  String getEAD_Order() throws Exception {
+		//int RowNum, int ColNum
+		try {
+			String CellData=null;
+			int rowCount=getRowUsed();
+			System.out.println("total row "+rowCount);
+			for(int i=1;i<=rowCount;i++)
+			{
+				Cell = sheet.getRow(i).getCell(3);
+				if(Cell==null)
+				{
+					//XSSFCell cell=sheet.getRow(i).createCell(2);
+					//cell.setCellValue("Y");
+					//excelClose();
+					CellData = sheet.getRow(i).getCell(1).getStringCellValue();
+					break;
+				}				
+			}
+			System.out.println("Service Id "+CellData);
+			return CellData;	
+			
+		} catch (Exception e) {
+			return null;
+		}	
+	}
+	public  void setCellData(String Result, int RowNum, int ColNum) throws Exception {
+		try {
+			Row = sheet.getRow(RowNum);
+			
+			if(Row==null)
+				Row = sheet.createRow(RowNum);
+			
+			Cell = Row.getCell(ColNum);
+			if (Cell == null) 
+				Cell = Row.createCell(ColNum);
+			
+				Cell.setCellValue(Result);
+		}
+		catch (Exception e) {
+			
+		}
+	}
+	public  void setCellData(String Result,int ColNum) throws Exception {
+		try {
+			
+			int rowCount=getRowUsed();
+			//System.out.println("total row "+rowCount);
+			for(int i=1;i<=rowCount;i++)
+			{
+				Cell = sheet.getRow(i).getCell(ColNum);
+				if(Cell==null)
+				{
+					XSSFCell cell=sheet.getRow(i).createCell(ColNum);
+					cell.setCellValue(Result);
+					excelClose();					
+					break;
+				}				
+			}
+		}
+		catch (Exception e) {
+			
+		}
+	}
+	public  void setEAD_Estimate(String Result) {
+		try {
+			boolean flag=false;
+			int rowCount=getRowUsed();
+			//System.out.println("total row "+rowCount);
+			for(int i=1;i<=rowCount;i++)
+			{
+				for(int j=0;j<2;j++)
+				{
+					Cell = sheet.getRow(i).getCell(3+j);
+					if(Cell==null)
+					{
+						XSSFCell cell=sheet.getRow(i).createCell(3+j);
+						cell.setCellValue(Result);
+						excelClose();
+						flag=true;
+						break;
+					}
+				}
+				if(flag) {
+					break;
+				}
+			}
+		}
+		catch (Exception e) {
+			
+		}
+	}	
+	public void excelClose() throws IOException {
+			if (env.equals("Mars"))
+			{				
+				//fileOut = new FileOutputStream(Constants.Excel_Test_Data_path_Mars);
+			}
+			if (env.equals("Bacchus"))
+			{
+				//fileOut = new FileOutputStream(Constants.Excel_Test_Data_path_Bacchus);
+			}
+			//FileOutputStream fileOut = new FileOutputStream(Constants.Excel_path);
+			workbook.write(fileOut);
+			fileOut.close();
+	}
+
+	public  int getRowUsed() throws Exception {
+			int RowCount = sheet.getLastRowNum()+1;
+			return RowCount;			
+
+		}
+	}
+

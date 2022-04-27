@@ -1,0 +1,229 @@
+package stepLocators;
+
+import java.io.File;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import Utility.ApplicationUtility;
+import Utility.Configuration;
+import Utility.Reports;
+import cucumber.api.Scenario;
+
+public class MasterPage extends Configuration{
+
+	//public static WebDriver driver;
+	//public static Reports report;
+	public WebElement element;
+	public static HashMap<String,String> dataMap=new HashMap<String,String>(); 
+	
+	public MasterPage(WebDriver driver) {
+		/*this.driver = driver;
+		this.report = report;*/
+		PageFactory.initElements(driver, this);
+	}
+
+	public boolean enterElementValue ( WebElement element, String value) {
+		try {
+			if (element.isDisplayed()) {
+				element.sendKeys(value);
+			}
+			return true;
+		} catch (Exception ex) {
+			System.out.println("inside else");
+			report.reportFailEvent("Element not entered successfully");
+		} return false;
+	}
+	public boolean waitForElementLoad( WebElement element) {
+		try {
+			WebDriverWait wait = new WebDriverWait(driver,120);
+			wait.until(ExpectedConditions.visibilityOf(element));	
+			return true;
+		} catch (Exception ex) {
+			System.out.println(ex);
+			report.reportFailEvent("Element is not loaded successfully");
+			return false;
+		}
+	}
+	public boolean waitForElementLoad( By by) {
+		try {
+			WebDriverWait wait = new WebDriverWait(driver,120);
+			wait.until(ExpectedConditions.presenceOfElementLocated(by));
+			return true;
+		} catch (Exception ex) {
+			System.out.println("inside else");
+			report.reportFailEvent("Element not loaded successfully");
+			return false;
+		}
+	}
+	public boolean selectValueByVisibleText(WebElement element , String value)
+	{
+		try {
+			Select select=new Select(element);
+			select.selectByVisibleText(value);
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+			report.reportFailEvent("Element not loaded successfully");
+			return false;
+		}
+		
+	}
+	public boolean selectValueByIndex(WebElement element , int value)
+	{
+		try {
+			Select select=new Select(element);
+			select.selectByIndex(value);
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+			report.reportFailEvent("Element not loaded successfully");
+			return false;
+		}
+		
+	}
+	
+	public boolean clickElement ( WebElement element) {
+		try {
+			if (element.isDisplayed()) {
+				element.click();
+				return true;
+			}
+		} catch (Exception ex) {
+			System.out.println("inside else");
+			report.reportFailEvent("Element not clicked successfully");
+		} return false;		
+	}
+	
+	  public static void wait(WebDriver driver, int timeOutInSeconds) throws InterruptedException {
+		  driver.manage().timeouts().implicitlyWait(timeOutInSeconds, TimeUnit.SECONDS);
+	    }
+
+	  public static Actions getAction(WebDriver driver) {
+	        Actions action = new Actions(driver);
+	        return action;
+	    }
+	  
+	  public static void tryCatch(int time) {
+		  try {
+				Thread.sleep(time);
+			} catch (Exception e) {
+				report.reportFailEvent("Time Out");
+			} 
+	  }
+
+		public static String getDate(int dayIncrement,String dateFormat)
+		{
+			//SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/YYYY");
+			SimpleDateFormat sdf=new SimpleDateFormat(dateFormat);
+			Date date=new Date();
+			Calendar c=Calendar.getInstance();
+			c.setTime(date);
+			c.add(Calendar.DATE, dayIncrement);
+			System.out.println(sdf.format(c.getTime()));
+			return sdf.format(c.getTime());
+			
+		}
+		public static String getCurrentDate()
+		{
+			SimpleDateFormat sdf=new SimpleDateFormat("dd_MM_YYYY_HHmmss");
+			Date date=new Date();
+			String sCurrentDate=sdf.format(date);		
+			//System.out.println(sCurrentDate);
+			return sCurrentDate;
+			
+		}
+		public static String getDay(int dayIncrement)
+		{
+			String newDay=null;
+			SimpleDateFormat sdf=new SimpleDateFormat("dd");
+			Date date=new Date();
+			Calendar c=Calendar.getInstance();
+			c.setTime(date);
+			c.add(Calendar.DATE, dayIncrement);
+			String day=sdf.format(c.getTime());
+			System.out.println("New Day "+day);		
+			if(day.startsWith("0"))
+			{
+				newDay=day.replace("0", "");
+				System.out.println("New day "+newDay);	
+				return newDay;
+			}
+				return day;			
+		}	
+		
+		public boolean fn_existsElement(WebElement element) {
+			boolean isPresent = false;
+
+			try {
+				if (element.isEnabled() && element.isDisplayed())
+					isPresent = true;
+			} catch (NoSuchElementException e) {
+				isPresent = false;
+			}
+			return isPresent;
+		}
+		
+		public void getScenario(Scenario scenario){
+			dataMap.put("scenario", scenario.getName().replaceAll(" ", "_"));
+		}
+		
+		public String getText(WebElement element){
+			return element.getText();
+		}
+		
+		public String getFlowDateTime(String KCIDateTime){
+			String flowDateTime=KCIDateTime;
+			if(!flowDateTime.equals("")){
+			if(flowDateTime.substring(0,2).equals("12")){
+				flowDateTime="00"+flowDateTime.substring(2,8);
+			}
+			}
+			System.out.println("flowDateTime:"+flowDateTime);
+			return flowDateTime;
+		}
+		public WebElement getWebElement(String xpath){
+			return driver.findElement(By.xpath(xpath));
+		}
+		public void verifyAlertPopUp(String alertMsg)
+		{
+			try {
+				WebDriverWait wait=new WebDriverWait(driver,90);
+				wait.until(ExpectedConditions.alertIsPresent());
+				Alert alert=driver.switchTo().alert();
+				Thread.sleep(2000);
+				System.out.println("Alert message :"+alert.getText());
+				report.fn_takeScreenShotFromRobotclass(alertMsg+" alert pop up");
+				if(alert.getText().contains(alertMsg))
+				{
+					alert.accept();
+				}else
+				{
+					report.reportFailEvent("Expected alert message "+alertMsg+" is not display on alert pop up");
+				}
+			} 
+			catch (Exception e) {
+				report.reportFailEvent("No alert pop up is didplayed");
+			}
+		}
+		
+}

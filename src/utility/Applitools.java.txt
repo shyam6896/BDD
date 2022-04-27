@@ -1,0 +1,76 @@
+package Utility;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import com.applitools.eyes.BatchInfo;
+import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.exceptions.DiffsFoundException;
+import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.fluent.Target;
+
+public class Applitool {
+
+		public static Eyes eyes;	
+		private static WebDriver driver;
+		
+		public Applitool(WebDriver driver) {
+			this.driver=driver;
+		}
+	
+	//----Initialize Batch
+		public void initializeBatch(String batchName){
+			try {
+				String myEyesServer = "Applitools url"; 
+				eyes = new Eyes();
+				BatchInfo batch=new BatchInfo(batchName);
+				eyes.setBatch(batch);
+				eyes.setMatchTimeout(0);
+				eyes.setSendDom(false); 
+				//eyes.setForceFullPageScreenshot(true);					
+				eyes.setApiKey("API KEy");
+				eyes.setServerUrl(myEyesServer);
+				eyes.open(driver, "FTTP_BF", batchName,new RectangleSize(1268, 638));
+				//eyes.open(driver, "FTTP_BF", batchName);
+				
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		}
+	/**
+	  * Capture window with check point image name.
+	  */	
+		public void verifyWindow(String checkImageName) throws Exception {		
+			try {
+				eyes.checkWindow(checkImageName);
+			} 
+			catch (IllegalStateException e) {
+				System.out.println(e);
+			}				
+		}
+		
+	/**
+	  * Capture only target popup window with check point image name.
+	  * You have to provide target popup window element location
+	  */	
+			public void verifyWindow(String checkImageName,WebElement element) throws Exception {		
+				try {
+					eyes.check(checkImageName, Target.region(element));
+					
+				} 
+				catch (IllegalStateException e) {
+					System.out.println(e);
+				}				
+			}
+	//--Close Eyes	
+		public void closeEyes()		{
+			try 
+			{
+				eyes.close();				
+			}
+			catch (DiffsFoundException e) {
+				System.out.println("Checkpoint Image is not matched with basline image in Applitool server");
+				
+			}
+		}
+}

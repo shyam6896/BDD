@@ -1,0 +1,15 @@
+package Utility;
+
+public abstract class Globalvariable {
+	
+	private static String featurename ;
+
+	public static String getFeaturename() {
+		return featurename;
+	}
+
+	public static void setFeaturename(String featurename) {
+		Globalvariable.featurename = featurename;
+	}
+
+}

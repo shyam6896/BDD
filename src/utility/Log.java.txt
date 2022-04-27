@@ -1,0 +1,54 @@
+package Utility;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Log {
+
+	// Initialize Log4j logs
+
+	final static Logger Log = Logger.getLogger(Log.class.getName());
+
+	 //We can use it when starting tests
+    public static void startTestCase (String testClassName){
+        Log.info("Test is Starting...");
+    }
+ 
+    //We can use it when ending tests
+    public static void endTestCase (String testClassName){
+        Log.info("Test is Ending...");
+    }
+
+	// Need to create these methods, so that they can be called  
+
+	public static void info(String message) {
+
+		Log.log(Level.INFO,message);
+
+	}
+
+	public static void warn(String message) {
+
+		Log.log(Level.WARNING,message);
+
+	}
+
+	public static void error(String message) {
+
+		Log.log(Level.SEVERE,message);
+
+	}
+
+	public static void fatal(String message) {
+
+		Log.log(Level.SEVERE,message);
+
+	}
+
+	public static void debug(String message) {
+
+		Log.log(Level.WARNING,message);
+
+	}
+
+}

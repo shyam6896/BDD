@@ -1,0 +1,233 @@
+package Utility;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+//import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.markuputils.ExtentColor;
+import com.aventstack.extentreports.markuputils.MarkupHelper;
+import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+
+import stepLocators.MasterPage;
+
+public class Configuration extends WrapperActionTest {
+	
+	static ExtentReports extent;
+	static ExtentTest logger;
+	public static Reports report;
+	public static WebDriver driver ;
+	public static Properties prop;
+	
+	public Configuration(){
+
+		try {
+			prop = new Properties();
+			FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "\\src\\config\\config.properties");
+			prop.load(fis);
+		} catch (IOException e) {
+			e.getMessage();
+		}
+	}
+
+	public void initializeReport(WebDriver driver) {
+		try {
+			Globalvariable.setFeaturename(this.getClass().getSimpleName());
+			report = Reports.getReportInstance();
+			report.setTestName(Globalvariable.getFeaturename());
+			report.startReport();
+			report.setDriver(driver);
+		} catch (Exception ex) {
+			Assert.fail(ex.getMessage());
+		}
+	}
+	
+	public static  WebDriver loadDriver() {
+		String browserName="";
+		try {
+			browserName = prop.getProperty("browser");
+			//String ip = Constants.IP;
+			//String port =Constants.port;
+			
+			switch (browserName) {
+				case "Chrome":
+					System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + File.separator + "lib" + File.separator + "chromedriver.exe");
+					
+					ChromeOptions ch_options = new ChromeOptions();
+					
+//					ch_options.addArguments("--start-maximized");
+					ch_options.setAcceptInsecureCerts(true);
+					ch_options.addArguments("--ignore-ssl-errors=yes");
+					ch_options.addArguments("--ignore-certificate-errors");
+					ch_options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.ACCEPT);
+					ch_options.setHeadless(false);
+					driver = new ChromeDriver(ch_options);
+					driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+					//driver.manage().window().setPosition(new Point(0, 0));
+					//driver.manage().window().setSize(new Dimension(1360, 768));					
+					break;
+					
+					
+				case "Edge":
+					System.setProperty("webdriver.edge.driver", System.getProperty("user.dir") + File.separator + "lib" + File.separator + "msedgedriver.exe");
+					
+					EdgeOptions ed_options = new EdgeOptions();
+					
+//					ch_options.addArguments("--start-maximized");
+//					ed_options.setAcceptInsecureCerts(true);
+//					ed_options.addArguments("--ignore-ssl-errors=yes");
+//					ed_options.addArguments("--ignore-certificate-errors");
+					ed_options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.ACCEPT);
+//					ed_options.setHeadless(false);
+					driver = new EdgeDriver(ed_options);
+					driver.manage().window().setPosition(new Point(0, 0));
+					driver.manage().window().setSize(new Dimension(1360, 768));
+					break;
+					
+					
+				case "Remote_Driver":
+/*//					DesiredCapabilities capability = DesiredCapabilities.chrome();
+//					capability.acceptInsecureCerts();
+					ChromeOptions remote_options = new ChromeOptions();
+					remote_options.addArguments("--start-maximized");
+					remote_options.setCapability("acceptInsecureCerts", true);
+					remote_options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.ACCEPT);
+					URL url = new URL("http://" + ip + ":" + port + "/wd/hub");
+					driver = new RemoteWebDriver(url, remote_options);
+
+					break;*/
+					
+				default:
+					report.reportFailEvent("Valid browser request is not submitted");
+			}
+		} catch (Exception ex) {
+			report.reportFailEvent(browserName+" initilize fail");
+		}
+		return driver;
+
+}
+	public static void waitForPageLoaded()
+	{
+		try {
+			JavascriptExecutor js =(JavascriptExecutor)driver;
+			//this loop will check if the page is ready
+			for(int i=0;i<400;i++)
+			{
+				Thread.sleep(4000);
+				if(js.executeScript("return document.readyState").toString().equals("complete"))
+				{					
+					break;
+				}				
+			}
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean waitForElementLoad(WebElement element) {
+
+		try {
+			WebDriverWait wait = new WebDriverWait(driver,90);
+			wait.until(ExpectedConditions.visibilityOf(element));
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}
+	public boolean selectValueByVisibleText(WebElement element, String text) {
+
+		try {
+			Select select =new Select(element);
+			select.selectByVisibleText(text);
+			Thread.sleep(1000);
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}
+	public boolean selectValueByValue(WebElement element, String text) {
+
+		try {
+			Select select =new Select(element);
+			select.selectByValue(text);
+			Thread.sleep(1000);
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}
+	 
+	public static String getDate(int dayIncrement)
+	{
+		SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/YYYY");
+		Date date=new Date();
+		Calendar c=Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.DATE, dayIncrement);
+		//System.out.println(sdf.format(c.getTime()));
+		return sdf.format(c.getTime());
+				
+	}
+	public static String getFutureMonthDate(int monthIncrement)
+	{
+		SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/YYYY");
+		Date date=new Date();
+		Calendar c=Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.MONTH, monthIncrement);
+		//System.out.println(sdf.format(c.getTime()));
+		return sdf.format(c.getTime());
+				
+	}
+	public static String getDay(int dayIncrement)
+	{
+		String newDay=null;
+		SimpleDateFormat sdf=new SimpleDateFormat("dd");
+		Date date=new Date();
+		Calendar c=Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.DATE, dayIncrement);
+		String day=sdf.format(c.getTime());
+		System.out.println("New Day "+day);		
+		if(day.startsWith("0"))
+		{
+			newDay=day.replace("0", "");
+			System.out.println("New day "+newDay);	
+			return newDay;
+		}
+			return day;			
+	}	
+	
+}
